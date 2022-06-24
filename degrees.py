@@ -91,10 +91,41 @@ def shortest_path(source, target):
 
     If no possible path, returns None.
     """
+    def construct_path(node: Node):
+        """
+        Constructs and returns the path as a list of
+        (movie_id, person_id) pairs.
+        """
+        path: list[tuple[int, int]] = []
 
-    # TODO
-    raise NotImplementedError
+        while node.parent:
+            path.append((node.action, node.state))
+            node = node.parent
 
+        path.reverse()
+
+        return path
+
+    explored: set[int] = set()
+    frontier = QueueFrontier()
+
+    explored.add(source)
+    frontier.add(Node(source, None, None))
+
+    # While there are nodes to be explored
+    while not frontier.empty():
+        current_node: Node = frontier.remove()
+
+        if target == current_node.state:
+            return construct_path(current_node)
+
+        explored.add(int(current_node.state))
+
+        for movie_id, person_id in neighbors_for_person(current_node.state):
+            if int(person_id) not in explored:
+                frontier.add(Node(person_id, current_node, movie_id))
+
+    return None
 
 def person_id_for_name(name):
     """
